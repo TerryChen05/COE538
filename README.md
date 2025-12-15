@@ -34,6 +34,8 @@ This repository contains lab assignments and the final project(WIP) for COE538 c
 - 8-bit software clock running at 23 Hz (43.7 ms resolution)
 - Timed alarm system using Timer Overflow counter
 - LCD output based on Timer alarms
+<img width="500" height="400" alt="image" src="https://github.com/user-attachments/assets/5b5f60fa-b391-4d97-93c6-65cf65009986" />
+
 
 **Files:**  
     `COE538_lab4/MotorTest/Sources/main.asm`  
@@ -64,20 +66,69 @@ This repository contains lab assignments and the final project(WIP) for COE538 c
 
 ---
 
-## Final Project: Robot Guidance Challenge (WIP)
+## Final Project: Robot Guidance Challenge
 
-**Objective:** Program the eebot to autonomously navigate a maze, learn the correct path, and retrace it.
+**Objective:** Program the eebot to use Cadmium Sulphide photoresistors to autonomously navigate a maze through line tracking and state machine logic.
 
 ### Project Requirements
-- Navigate a maze with S turns and L/T junctions
+- Implement a working line tracker guiding algorithm
 - Detect dead ends/barriers and make branching decisions at junctions
-- Store maze solution in memory
-- Retrace correct path on return journey
+- Navigate a maze with S turns and L/T junctions
+  - S turns: curved track
+  - L/T junctions: 2-3 path option intersections 
 
 ### Implementation Details
-- WIP
+1. **5-Sensor Array Configuration**:
+   - Sensor A (BOW): Front center sensor for forward alignment
+   - Sensor B (PORT): Left sensor for junction detection
+   - Sensor C (MID): Center tracking sensor for general alignment
+   - Sensor D (STBD): Right sensor for junction detection
+   - Sensor E/F (LINE): Alignment sensor for left/right drift detection
+   
+   <img width="400" height="310" alt="Sensor Array Layout" src="https://github.com/user-attachments/assets/ced37e9a-d9f7-44db-b94a-9069c29274f5" />
+   
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Fig. 1: Bird’s Eye View of the Sensor Configuration
+    
+2. **Sensor Calibration**:
+   - CdS sensors have high resistance in darkness, and low resistance when illuminated
+   - Base dark values (sensor over black track line) and corresponding tolerance thresholds for each sensor
+     <img width="440" height="180" alt="image" src="https://github.com/user-attachments/assets/4ecd2b73-29fd-437c-98f4-b0273425425d" />
 
-**File:** `N/A`
+3. **State Machine Architecture**:
+   
+    | State       | State # | Description                                     |
+    |-------------|------|-------------------------------------------------|
+    | START       | 0    | Initial state; waits for front bumper trigger to begin |
+    | FWD         | 1    | Forward motion with active line tracking and junction detection |
+    | ALL_STOP    | 2    | Emergency stop triggered by rear bumper        |
+    | LEFT_TRN    | 3    | Executing left turn at junction                |
+    | RIGHT_TRN   | 4    | Executing right turn at junction               |
+    | REV_TRN     | 5    | 180° reversal after hitting dead end           |
+    | L_ALIGN     | 6    | Post-left-turn alignment to center on line     |
+    | R_ALIGN     | 7    | Post-right-turn alignment to center on line    |
+4. **Navigation Logic**:
+    1. **Strategy**:
+       - The robot follows a **left-priority** exploration strategy (always attempts left turn first)
+       - At right-facing L junctions: Continues forward if no left option exists
+       - At dead ends, execute a 180° turn and retrace the path
+    2. **Line Following**:
+       - Continuous sensor polling (multiple times per second)
+       - Proportional steering corrections based on sensor readings
+       - Detects when sensors A and C are aligned (within tolerance) with the track
+       - Corrects for left/right drift using sensor E/F readings 
+    3. **Junction Detection**:
+       - Detects L and T junctions when sensors B or D detect line presence
+       - Executes a series of partial turns to navigate branches (left -> fwd -> right branch priority)
+       - Finishes turns with alignment checks
+    4. **Dead End Recovery**:
+       - Front bumper collision triggers REV_TRN state
+       - Executes a 180° turn sequence by briefly reversing before performing a right turn, ending when the BOW is aligned with the track 
+
+
+
+
+
+**File:** `COE538_FinalProject/maze_solving_robot/Sources/main.asm`
 
 ---
 
