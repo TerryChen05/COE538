@@ -1,6 +1,6 @@
 # COE538 - Microprocessor Systems
 
-This repository contains lab assignments and the final project(WIP) for COE538 completed in Fall 2025. The course focuses on programming the HCS12 microcontroller (9S12C32) for the eebot (a mobile robot) using assembly language.
+This repository contains lab assignments and the final project for COE538 completed in Fall 2025. The course focuses on programming the HCS12 microcontroller (9S12C32) for the eebot (a mobile robot) using assembly language.
 
 > **Note:** Labs 1 and 2 focused on fundamental assembly programming concepts, serving primarily as introductory exercises, with the later labs directly building on the introduced topics, so I haven't included them in this repository.
 
